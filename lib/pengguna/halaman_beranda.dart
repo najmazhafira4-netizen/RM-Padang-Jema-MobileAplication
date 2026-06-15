@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'halaman_checkout.dart';
 import 'package:flutter_application_1/auth/halaman_login.dart';
-import 'dart:io';
 import 'halaman_history.dart';
 
 class HalamanBeranda extends StatefulWidget {
@@ -34,7 +32,7 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
   
   // Fungsi untuk mengambil data menu dan sisa stok sekaligus dari Spreadsheet
   Future<void> _fetchMenu() async {
-    const String urlMenu = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec?p=menu'; 
+    const String urlMenu = 'https://script.google.com/macros/s/AKfycbwIQDaiP-5iVaKHuS9vJFS43tEh2Mt1LrrLe3eoS1YPTJUn29lTJohIDaqXIUKduGlB/exec?p=menu'; 
     
     try {
       final response = await http.get(Uri.parse(urlMenu));
@@ -210,25 +208,25 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
           iconTheme: const IconThemeData(color: Colors.white),
           actions: [
             IconButton(
-              icon: const Icon(Icons.exit_to_app, color: Colors.white),
-              tooltip: 'Keluar Aplikasi',
+              icon: const Icon(Icons.logout, color: Colors.white),
+              tooltip: 'Log Keluar Akun',
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Keluar'),
-                    content: const Text('Apakah Anda yakin ingin menutup aplikasi?'),
+                    title: const Text('Keluar Akun'),
+                    content: const Text('Apakah Anda yakin ingin keluar dari akun Anda?'),
                     actions: [
                       TextButton(onPressed: () => Navigator.pop(context), child: const Text('BATAL')),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context); 
-                          SystemNavigator.pop();
-                          Future.delayed(const Duration(milliseconds: 100), () {
-                            exit(0); 
-                          });
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HalamanLogin()),
+                          );
                         }, 
-                        child: const Text('YA', style: TextStyle(color: Colors.red)),
+                        child: const Text('YA KELUAR', style: TextStyle(color: Colors.red)),
                       )
                     ],
                   ),

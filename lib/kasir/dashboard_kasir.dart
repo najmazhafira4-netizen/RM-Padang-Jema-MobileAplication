@@ -22,7 +22,7 @@ class _DashboardKasirState extends State<DashboardKasir> {
   }
 
   Future<void> _fetchRiwayat() async {
-    const String url = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec?p=riwayat';
+    const String url = 'https://script.google.com/macros/s/AKfycbwIQDaiP-5iVaKHuS9vJFS43tEh2Mt1LrrLe3eoS1YPTJUn29lTJohIDaqXIUKduGlB/exec?p=riwayat';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {

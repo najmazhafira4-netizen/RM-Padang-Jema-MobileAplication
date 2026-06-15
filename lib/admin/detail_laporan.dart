@@ -97,9 +97,9 @@ class HalamanDetailLaporan extends StatelessWidget {
                             String bersih = totalBayar.toString().replaceAll(RegExp(r'[^0-9]'), '');
                             double nilaiTotal = double.tryParse(bersih) ?? 0;
                             return DataRow(cells: [
-                              DataCell(Text(pesanan['Nama'] ?? pesanan['nama'] ?? '-')),
-                              DataCell(Text(pesanan['Meja'] ?? pesanan['meja'] ?? '-')),
-                              DataCell(Text(pesanan['Waktu'] ?? pesanan['waktu'] ?? '-')),
+                              DataCell(Text((pesanan['Nama'] ?? pesanan['nama'] ?? '-').toString())),
+                              DataCell(Text((pesanan['Meja'] ?? pesanan['meja'] ?? '-').toString())),
+                              DataCell(Text((pesanan['Waktu'] ?? pesanan['waktu'] ?? '-').toString())),
                               DataCell(Text(formatRupiah(nilaiTotal), style: const TextStyle(fontWeight: FontWeight.w600))),
                             ]);
                           }).toList(),

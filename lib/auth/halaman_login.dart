@@ -100,21 +100,7 @@ class _HalamanLoginState extends State<HalamanLogin> {
     }
   }
 
-  void _prosesLoginGoogle() {
-    setState(() => _isLoading = true);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login via Google Berhasil!'), backgroundColor: Colors.green),
-      );
-      // Untuk Google Auth simulasi, kita default kan nama pengguna sebagai "Pelanggan Google"
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HalamanSampul(namaPengguna: "Pelanggan Google")),
-      );
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -192,34 +178,7 @@ class _HalamanLoginState extends State<HalamanLogin> {
                               : const Text('MASUK SISTEM', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      const Row(
-                        children: [
-                          Expanded(child: Divider(color: Colors.grey)),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Text("atau", style: TextStyle(color: Colors.grey, fontSize: 12)),
-                          ),
-                          Expanded(child: Divider(color: Colors.grey)),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: OutlinedButton.icon(
-                          icon: Image.network(
-                            'https://thumbs.dreamstime.com/b/google-logo-vector-format-white-background-illustration-407571048.jpg',
-                            height: 22,
-                          ),
-                          label: const Text('Masuk dengan Google', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.grey),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          onPressed: _isLoading ? null : _prosesLoginGoogle,
-                        ),
-                      ),
+
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
