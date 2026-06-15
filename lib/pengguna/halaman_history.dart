@@ -14,7 +14,7 @@ class HalamanHistory extends StatefulWidget {
 
 class _HalamanHistoryState extends State<HalamanHistory> {
   // URL Web App Google Apps Script Anda (Sesuaikan dengan URL Deployment Anda)
-  final String urlGoogleScript = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec';
+  final String urlGoogleScript = 'https://script.google.com/macros/s/AKfycbwIQDaiP-5iVaKHuS9vJFS43tEh2Mt1LrrLe3eoS1YPTJUn29lTJohIDaqXIUKduGlB/exec';
   
   List<dynamic> _listRiwayat = [];
   bool _isLoading = true;
@@ -34,8 +34,8 @@ class _HalamanHistoryState extends State<HalamanHistory> {
     });
 
     try {
-      // Mengirim request GET dengan parameter action dan nama khusus akun tersebut
-      final String urlLengkap = "$urlGoogleScript?action=ambilRiwayat&nama=${Uri.encodeComponent(widget.namaPengguna)}";
+      // Mengirim request GET dengan parameter p dan nama khusus akun tersebut
+      final String urlLengkap = "$urlGoogleScript?p=riwayat&nama=${Uri.encodeComponent(widget.namaPengguna)}";
       final response = await http.get(Uri.parse(urlLengkap));
 
       if (response.statusCode == 200 || response.statusCode == 302) {
@@ -97,8 +97,14 @@ class _HalamanHistoryState extends State<HalamanHistory> {
                       itemBuilder: (context, index) {
                         final pesanan = _listRiwayat[index];
                         
-                        // Format mata uang sederhana ke Rupiah lokal
-                        int totalHarga = pesanan['total'] ?? 0;
+                        int totalHarga = 0;
+                        if (pesanan['total'] != null) {
+                          if (pesanan['total'] is num) {
+                            totalHarga = (pesanan['total'] as num).toInt();
+                          } else {
+                            totalHarga = int.tryParse(pesanan['total'].toString().replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+                          }
+                        }
                         String formatRupiah = totalHarga.toString().replaceAllMapped(
                           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), 
                           (Match m) => '${m[1]}.'

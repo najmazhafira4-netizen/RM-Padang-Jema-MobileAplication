@@ -4,17 +4,31 @@ import 'dart:convert';
 
 class HalamanCheckout extends StatefulWidget {
   final List<Map<String, dynamic>> isiKeranjang;
-  const HalamanCheckout({super.key, required this.isiKeranjang});
+  final String namaPengguna;
+  const HalamanCheckout({super.key, required this.isiKeranjang, required this.namaPengguna});
 
   @override
   State<HalamanCheckout> createState() => _HalamanCheckoutState();
 }
 
 class _HalamanCheckoutState extends State<HalamanCheckout> {
-  final _namaController = TextEditingController();
+  late final TextEditingController _namaController;
   final _mejaController = TextEditingController();
   String _metodeBayar = 'Tunai (Kasir)';
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _namaController = TextEditingController(text: widget.namaPengguna);
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _mejaController.dispose();
+    super.dispose();
+  }
 
   final Map<String, String> infoPembayaran = {
     'GoPay': '0812-3456-7890 (Najma Zhafira Nofika)',
@@ -36,7 +50,7 @@ class _HalamanCheckoutState extends State<HalamanCheckout> {
     }
     
     setState(() => _isLoading = true);
-    const String urlGAS = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec';
+    const String urlGAS = 'https://script.google.com/macros/s/AKfycbwIQDaiP-5iVaKHuS9vJFS43tEh2Mt1LrrLe3eoS1YPTJUn29lTJohIDaqXIUKduGlB/exec';
     
     try {
       // Format waktu yang lebih rapi untuk lokal Indonesia (DD/MM/YYYY HH:mm)
@@ -61,9 +75,10 @@ class _HalamanCheckoutState extends State<HalamanCheckout> {
 
       final response = await http.post(
         Uri.parse(urlGAS), 
-        headers: {"Content-Type": "application/json"},
         body: jsonEncode(data),
       );
+
+      if (!mounted) return;
 
       if (response.statusCode == 200 || response.statusCode == 302) {
         if (mounted) {

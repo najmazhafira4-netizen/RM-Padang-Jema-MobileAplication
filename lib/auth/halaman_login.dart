@@ -20,7 +20,7 @@ class _HalamanLoginState extends State<HalamanLogin> {
   bool _isLoading = false;
 
   // GANTI dengan URL Web App Google Apps Script Anda yang baru
-  final String urlGoogleScript = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec';
+  final String urlGoogleScript = 'https://script.google.com/macros/s/AKfycbwIQDaiP-5iVaKHuS9vJFS43tEh2Mt1LrrLe3eoS1YPTJUn29lTJohIDaqXIUKduGlB/exec';
 
   Future<void> _prosesLogin() async {
     final user = _usernameController.text.trim();
@@ -46,24 +46,27 @@ class _HalamanLoginState extends State<HalamanLogin> {
         }),
       );
 
+      if (!mounted) return;
+
       if (response.statusCode == 200 || response.statusCode == 302) {
         final dataRespon = jsonDecode(response.body);
 
         if (dataRespon['status'] == 'success') {
           // Tangkap nama asli pengguna dari spreadsheet
-          String namaUser = dataRespon['nama'] ?? user; 
+          String namaUser = dataRespon['nama_lengkap'] ?? dataRespon['nama'] ?? user; 
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login Berhasil! Selamat datang, $namaUser'), backgroundColor: Colors.green),
           );
 
-          // 2. Cek Role Akun Secara Manual (Bisa disesuaikan jika admin/kasir masih lokal)
-          if (user.toLowerCase() == 'admin' && pass == '123') {
+          // 2. Cek Role Akun berdasarkan data dari database spreadsheet
+          String role = (dataRespon['role'] ?? 'pengguna').toString().toLowerCase().trim();
+          if (role == 'admin') {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const DashboardAdmin()),
             );
-          } else if (user.toLowerCase() == 'kasir' && pass == '123') {
+          } else if (role == 'kasir') {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const DashboardKasir()),
@@ -100,6 +103,7 @@ class _HalamanLoginState extends State<HalamanLogin> {
   void _prosesLoginGoogle() {
     setState(() => _isLoading = true);
     Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login via Google Berhasil!'), backgroundColor: Colors.green),

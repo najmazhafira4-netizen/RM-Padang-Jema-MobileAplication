@@ -19,7 +19,7 @@ class _HalamanRegistrasiState extends State<HalamanRegistrasi> {
   bool _isLoading = false;
 
   // GANTI dengan URL Web App Google Apps Script Anda yang baru di-deploy
-  final String urlGoogleScript = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec';
+  final String urlGoogleScript = 'https://script.google.com/macros/s/AKfycbwIQDaiP-5iVaKHuS9vJFS43tEh2Mt1LrrLe3eoS1YPTJUn29lTJohIDaqXIUKduGlB/exec';
 
   Future<void> _prosesRegistrasi() async {
     final nama = _namaController.text.trim();
@@ -50,12 +50,14 @@ class _HalamanRegistrasiState extends State<HalamanRegistrasi> {
       final response = await http.post(
         Uri.parse(urlGoogleScript),
         body: jsonEncode({
-          "action": "daftar",
-          "nama": nama,
+          "action": "register",
+          "nama_lengkap": nama,
           "username": user,
           "password": pass,
         }),
       );
+
+      if (!mounted) return;
 
       if (response.statusCode == 200 || response.statusCode == 302) {
         final dataRespon = jsonDecode(response.body);

@@ -32,10 +32,9 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
     _fetchStok(); // Ambil data sisa stok
   }
   
-  // Fungsi baru untuk mengambil data menu dari Spreadsheet
+  // Fungsi untuk mengambil data menu dan sisa stok sekaligus dari Spreadsheet
   Future<void> _fetchMenu() async {
-    // TAMBAHKAN URL WEB APP APPS SCRIPT MENU ANDA DI SINI
-    const String urlMenu = 'https://script.google.com/macros/s/URL_APPS_SCRIPT_MENU_ANDA/exec'; 
+    const String urlMenu = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec?p=menu'; 
     
     try {
       final response = await http.get(Uri.parse(urlMenu));
@@ -45,13 +44,42 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
         List<Map<String, dynamic>> tempMakanan = [];
         List<Map<String, dynamic>> tempMinuman = [];
         List<Map<String, dynamic>> tempDessert = [];
+        Map<String, dynamic> tempStok = {};
 
         for (var item in dataMentah) {
+          var hargaRaw = item['harga'];
+          String hargaStr = 'Rp 0';
+          if (hargaRaw != null) {
+            if (hargaRaw is num) {
+              String formatRupiah = hargaRaw.toString().replaceAllMapped(
+                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), 
+                (Match m) => '${m[1]}.'
+              );
+              hargaStr = 'Rp $formatRupiah';
+            } else {
+              hargaStr = hargaRaw.toString().trim();
+              if (hargaStr.isNotEmpty && !hargaStr.startsWith('Rp')) {
+                hargaStr = 'Rp $hargaStr';
+              }
+            }
+          }
+
           Map<String, dynamic> menuFormatted = {
             'nama': item['nama'] ?? '',
-            'harga': item['harga'] ?? 'Rp 0',
-            'gambar': item['gambar'] ?? 'https://tse3.mm.bing.net/th/id/OIP.OJ2pGhBzT9FR_Wf66kpsIQHaG1?pid=Api&P=0&h=220', // Default image jika kosong
+            'harga': hargaStr,
+            'gambar': item['gambar'] ?? 'https://tse3.mm.bing.net/th/id/OIP.OJ2pGhBzT9FR_Wf66kpsIQHaG1?pid=Api&P=0&h=220',
           };
+
+          String nama = item['nama'] ?? '';
+          int stokVal = 0;
+          if (item['stok'] != null) {
+            if (item['stok'] is num) {
+              stokVal = (item['stok'] as num).toInt();
+            } else {
+              stokVal = int.tryParse(item['stok'].toString()) ?? 0;
+            }
+          }
+          tempStok[nama] = stokVal;
 
           // Mengonversi string kategori ke huruf kecil semua agar aman dari typo penulisan di Sheet
           String kategori = item['kategori'].toString().toLowerCase().trim();
@@ -69,6 +97,7 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
           menuMakanan = tempMakanan;
           menuMinuman = tempMinuman;
           menuDessert = tempDessert;
+          _stokMenu = tempStok;
           _isLoadingMenu = false;
         });
       }
@@ -81,17 +110,7 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
   }
   
   Future<void> _fetchStok() async {
-    const String url = 'https://script.google.com/macros/s/AKfycby8l_DtCoWgPRJ7-4uxyX4IQjk5UoAD2izt1pBqwFxPcLPHffVG8iMv5Y9KryMfUM8s/exec'; 
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        setState(() {
-          _stokMenu = jsonDecode(response.body);
-        });
-      }
-    } catch (e) {
-      print("Error Stok: $e");
-    }
+    await _fetchMenu();
   }
 
   void tambahKeKeranjang(Map<String, dynamic> menu) {
@@ -285,7 +304,12 @@ class _HalamanBerandaState extends State<HalamanBeranda> {
                     onPressed: () async {
                       final hasil = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HalamanCheckout(isiKeranjang: keranjang)),
+                        MaterialPageRoute(
+                          builder: (context) => HalamanCheckout(
+                            isiKeranjang: keranjang,
+                            namaPengguna: widget.namaPengguna,
+                          ),
+                        ),
                       );
                       if (hasil == true) {
                         setState(() { keranjang.clear(); });
