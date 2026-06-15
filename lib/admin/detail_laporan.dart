@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'halaman_pratinjau_pdf.dart';
 
 class HalamanDetailLaporan extends StatelessWidget {
   final String tipeLaporan;
@@ -24,6 +25,23 @@ class HalamanDetailLaporan extends StatelessWidget {
         title: Text('Laporan Keuangan $tipeLaporan'),
         backgroundColor: const Color.fromARGB(255, 174, 23, 23),
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.print),
+            tooltip: 'Cetak Laporan',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HalamanPratinjauPdf(
+                    tipeLaporan: tipeLaporan,
+                    daftarPesanan: daftarPesanan,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

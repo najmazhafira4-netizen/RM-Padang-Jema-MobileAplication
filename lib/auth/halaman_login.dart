@@ -37,7 +37,7 @@ class _HalamanLoginState extends State<HalamanLogin> {
 
     try {
       // 1. Kirim request login ke Google Spreadsheet
-      final response = await http.post(
+      var response = await http.post(
         Uri.parse(urlGoogleScript),
         body: jsonEncode({
           "action": "login",
@@ -45,6 +45,15 @@ class _HalamanLoginState extends State<HalamanLogin> {
           "password": pass,
         }),
       );
+
+      // Ikuti redirect 302/301 secara manual (sangat penting untuk platform mobile Android/iOS)
+      int redirectCount = 0;
+      while ((response.statusCode == 302 || response.statusCode == 301) && redirectCount < 5) {
+        final location = response.headers['location'];
+        if (location == null || location.isEmpty) break;
+        response = await http.get(Uri.parse(location));
+        redirectCount++;
+      }
 
       if (!mounted) return;
 
